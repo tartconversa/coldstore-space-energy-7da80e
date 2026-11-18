@@ -1,0 +1,402 @@
+{
+  "title": "共享冷库的空间与能耗计量仓",
+  "synthetic": true,
+  "tables": [
+    {
+      "name": "zones",
+      "description": "历史温区。",
+      "columns": [
+        {
+          "name": "zone_version",
+          "type": "string",
+          "description": "版",
+          "nullable": true
+        },
+        {
+          "name": "zone",
+          "type": "string",
+          "description": "温区",
+          "nullable": true
+        },
+        {
+          "name": "start",
+          "type": "datetime",
+          "description": "起",
+          "nullable": true
+        },
+        {
+          "name": "end",
+          "type": "datetime",
+          "description": "止",
+          "nullable": true
+        },
+        {
+          "name": "capacity_m3",
+          "type": "number",
+          "description": "容量",
+          "nullable": true
+        },
+        {
+          "name": "weight",
+          "type": "number",
+          "description": "温控权重",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "zone_version"
+      ],
+      "references": [],
+      "path": "data/zones.csv",
+      "row_count": 3,
+      "sha256": "1f221a6260b86c0513c81799e04647d13328fb3013557e404c0f5725c5905ff9"
+    },
+    {
+      "name": "meters",
+      "description": "表计。",
+      "columns": [
+        {
+          "name": "meter_id",
+          "type": "string",
+          "description": "表",
+          "nullable": true
+        },
+        {
+          "name": "modulus",
+          "type": "number",
+          "description": "回绕模数或空",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "meter_id"
+      ],
+      "references": [],
+      "path": "data/meters.csv",
+      "row_count": 4,
+      "sha256": "a8a8618793c710292a218d1d11f1e24f991fe854f21f2dbacfc34057841e73da"
+    },
+    {
+      "name": "topology",
+      "description": "包含关系及时段。",
+      "columns": [
+        {
+          "name": "relation_id",
+          "type": "string",
+          "description": "关系",
+          "nullable": true
+        },
+        {
+          "name": "parent",
+          "type": "string",
+          "description": "总表",
+          "nullable": true
+        },
+        {
+          "name": "child",
+          "type": "string",
+          "description": "分表",
+          "nullable": true
+        },
+        {
+          "name": "zone",
+          "type": "string",
+          "description": "温区",
+          "nullable": true
+        },
+        {
+          "name": "tenant",
+          "type": "string",
+          "description": "独立租户或空",
+          "nullable": true
+        },
+        {
+          "name": "start",
+          "type": "datetime",
+          "description": "起",
+          "nullable": true
+        },
+        {
+          "name": "end",
+          "type": "datetime",
+          "description": "止",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "relation_id"
+      ],
+      "references": [
+        {
+          "column": "parent",
+          "target_table": "meters",
+          "target_column": "meter_id"
+        },
+        {
+          "column": "child",
+          "target_table": "meters",
+          "target_column": "meter_id"
+        }
+      ],
+      "path": "data/topology.csv",
+      "row_count": 3,
+      "sha256": "9408f3ed7b85ce89dadfecdee162418b9c93382fa1e30a5c2caef0a3d1e4f86c"
+    },
+    {
+      "name": "readings",
+      "description": "累计电量。",
+      "columns": [
+        {
+          "name": "reading_id",
+          "type": "string",
+          "description": "记录",
+          "nullable": true
+        },
+        {
+          "name": "meter_id",
+          "type": "string",
+          "description": "表",
+          "nullable": true
+        },
+        {
+          "name": "read_at",
+          "type": "datetime",
+          "description": "时点",
+          "nullable": true
+        },
+        {
+          "name": "kwh",
+          "type": "number",
+          "description": "累计",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "reading_id"
+      ],
+      "references": [
+        {
+          "column": "meter_id",
+          "target_table": "meters",
+          "target_column": "meter_id"
+        }
+      ],
+      "path": "data/readings.csv",
+      "row_count": 10,
+      "sha256": "2338de9ff58525b607baaabfd56961b23029ffb544963fd867f4a2e7f5b0c43c"
+    },
+    {
+      "name": "replacements",
+      "description": "物理换表底数，不附加耗能。",
+      "columns": [
+        {
+          "name": "replacement_id",
+          "type": "string",
+          "description": "更换",
+          "nullable": true
+        },
+        {
+          "name": "old_meter",
+          "type": "string",
+          "description": "旧表",
+          "nullable": true
+        },
+        {
+          "name": "new_meter",
+          "type": "string",
+          "description": "新表",
+          "nullable": true
+        },
+        {
+          "name": "at",
+          "type": "datetime",
+          "description": "时点",
+          "nullable": true
+        },
+        {
+          "name": "old_end",
+          "type": "number",
+          "description": "旧末",
+          "nullable": true
+        },
+        {
+          "name": "new_start",
+          "type": "number",
+          "description": "新底",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "replacement_id"
+      ],
+      "references": [
+        {
+          "column": "old_meter",
+          "target_table": "meters",
+          "target_column": "meter_id"
+        },
+        {
+          "column": "new_meter",
+          "target_table": "meters",
+          "target_column": "meter_id"
+        }
+      ],
+      "path": "data/replacements.csv",
+      "row_count": 1,
+      "sha256": "1d20f443a548a6ad708238328c759ac55b89333630631b2abac7cf945bb3cb03"
+    },
+    {
+      "name": "occupancy",
+      "description": "货物实际占用区间，open表示资料尚不闭合。",
+      "columns": [
+        {
+          "name": "occupancy_id",
+          "type": "string",
+          "description": "占用",
+          "nullable": true
+        },
+        {
+          "name": "cargo_id",
+          "type": "string",
+          "description": "货物",
+          "nullable": true
+        },
+        {
+          "name": "tenant",
+          "type": "string",
+          "description": "租户",
+          "nullable": true
+        },
+        {
+          "name": "zone",
+          "type": "string",
+          "description": "区",
+          "nullable": true
+        },
+        {
+          "name": "start",
+          "type": "datetime",
+          "description": "起",
+          "nullable": true
+        },
+        {
+          "name": "end",
+          "type": "datetime",
+          "description": "止",
+          "nullable": true
+        },
+        {
+          "name": "volume_m3",
+          "type": "number",
+          "description": "体积",
+          "nullable": true
+        },
+        {
+          "name": "evidence",
+          "type": "string",
+          "description": "complete或open",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "occupancy_id"
+      ],
+      "references": [],
+      "path": "data/occupancy.csv",
+      "row_count": 5,
+      "sha256": "280c78d378db16b5c7ba2cbd8d698ddb7ef29df7da43b2d81095d04fb6ac72e8"
+    },
+    {
+      "name": "reservations",
+      "description": "合同预留。",
+      "columns": [
+        {
+          "name": "reservation_id",
+          "type": "string",
+          "description": "预留",
+          "nullable": true
+        },
+        {
+          "name": "tenant",
+          "type": "string",
+          "description": "租户",
+          "nullable": true
+        },
+        {
+          "name": "zone",
+          "type": "string",
+          "description": "区",
+          "nullable": true
+        },
+        {
+          "name": "start",
+          "type": "datetime",
+          "description": "起",
+          "nullable": true
+        },
+        {
+          "name": "end",
+          "type": "datetime",
+          "description": "止",
+          "nullable": true
+        },
+        {
+          "name": "volume_m3",
+          "type": "number",
+          "description": "体积",
+          "nullable": true
+        },
+        {
+          "name": "space_price",
+          "type": "number",
+          "description": "元每m3每天",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "reservation_id"
+      ],
+      "references": [],
+      "path": "data/reservations.csv",
+      "row_count": 5,
+      "sha256": "1de502018cb0d4a3c0b134dbb28cc49e1c4fca23ee9c47e1da1324ff4d601d21"
+    },
+    {
+      "name": "tariffs",
+      "description": "内部计费约定。",
+      "columns": [
+        {
+          "name": "tariff_id",
+          "type": "string",
+          "description": "口径",
+          "nullable": true
+        },
+        {
+          "name": "start",
+          "type": "datetime",
+          "description": "起",
+          "nullable": true
+        },
+        {
+          "name": "end",
+          "type": "datetime",
+          "description": "止",
+          "nullable": true
+        },
+        {
+          "name": "energy_price",
+          "type": "number",
+          "description": "元每kWh",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "tariff_id"
+      ],
+      "references": [],
+      "path": "data/tariffs.csv",
+      "row_count": 1,
+      "sha256": "838f52d03d77fba267f01c7259d1e7f7a309c475cc98c020a2efd7f4d611cb15"
+    }
+  ]
+}
